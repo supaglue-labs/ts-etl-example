@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:15
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init_db.sql
+    restart: on-failure
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+  api:
+    image: node:18
+    ports:
+      - '3030:3030'
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/supaglue?schema=public
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: yarn start
+volumes:
+  pgdata:
