@@ -27,7 +27,11 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
     );
     await Promise.all(
       objectListNames.map((objectListName) =>
-        readAndWritePage(objectListName, watermarkManager.get(objectListName))
+        readAndWritePage(
+          objectListName,
+          watermarkManager.get(objectListName),
+          watermarkManager.get(objectListName)
+        )
       )
     );
   }

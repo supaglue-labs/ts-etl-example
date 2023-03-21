@@ -42,6 +42,7 @@ function getAxiosConfig(
 export async function readAndWritePage(
   objectListName: string,
   startingUpdatedAt: Date,
+  latestUpdatedAtSoFar: Date,
   cursor?: string
 ) {
   const requestStartEpoch = debugLogRequestStart(objectListName);
@@ -55,8 +56,6 @@ export async function readAndWritePage(
     requestStartEpoch,
     response.data.results.length
   );
-
-  let latestBatchUpdatedAt = watermarkManager.get(objectListName);
 
   const writeStartEpoch = debugLogWriteStart(objectListName);
 
@@ -79,11 +78,8 @@ export async function readAndWritePage(
           },
         });
 
-        if (
-          Date.parse(result.updated_at) >
-          watermarkManager.get(objectListName).getTime()
-        ) {
-          latestBatchUpdatedAt = new Date(result.updated_at);
+        if (Date.parse(result.updated_at) > latestUpdatedAtSoFar.getTime()) {
+          latestUpdatedAtSoFar = new Date(result.updated_at);
         }
       }
     },
@@ -92,15 +88,17 @@ export async function readAndWritePage(
     }
   );
 
-  watermarkManager.set(objectListName, latestBatchUpdatedAt);
-
   debugLogWriteEnd(objectListName, writeStartEpoch);
 
   if (response.data.next) {
     await readAndWritePage(
       objectListName,
       startingUpdatedAt,
+      latestUpdatedAtSoFar,
       response.data.next
     );
+  } else {
+    // Supaglue list endpoints are ordered by id so we can only set a new watermark if we've paginated through all pages.
+    watermarkManager.set(objectListName, latestUpdatedAtSoFar);
   }
 }

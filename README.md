@@ -18,7 +18,7 @@ docker compose up
 Then, trigger the webhook endpoint:
 
 ```shell
-curl localhost:3030/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCEEDED"}'
+curl localhost:3030/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS"}'
 ```
 
 Inspect the synced data in Postgres (password: `postgres`):
