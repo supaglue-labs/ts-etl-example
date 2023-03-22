@@ -6,7 +6,7 @@ import { WatermarkManager } from "./lib/watermark_manager";
 
 const app = express();
 app.use(express.json());
-const port = 3030;
+const port = process.env.PORT || 3030;
 const { SYNC_PARALLELISM = "1", AWS_S3_BUCKET: isS3Destination } = process.env;
 
 // Persist this for the duration that the server is running.
@@ -19,7 +19,7 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
 
   const objectsToSync = [
     "users",
-    // "accounts",
+    "accounts",
     "leads",
     "opportunities",
     "contacts",
