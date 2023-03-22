@@ -15,5 +15,3 @@ export class WatermarkManager {
     this.lastUpdatedAt[objectListName] = date;
   }
 }
-
-export const watermarkManager = new WatermarkManager();

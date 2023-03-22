@@ -1,11 +1,16 @@
 import express from "express";
-import { readAndWritePage } from "./lib/supaglue";
-import { watermarkManager } from "./lib/watermark_manager";
+import { PrismaDestination } from "./lib/destinations/prisma";
+import { S3Destination } from "./lib/destinations/s3";
+import { SupagluePaginator } from "./lib/supaglue_paginator";
+import { WatermarkManager } from "./lib/watermark_manager";
 
 const app = express();
 app.use(express.json());
 const port = 3030;
-const { SYNC_PARALLELISM = "1" } = process.env;
+const { SYNC_PARALLELISM = "1", AWS_S3_BUCKET: isS3Destination } = process.env;
+
+// Persist this for the duration that the server is running.
+const watermarkManager = new WatermarkManager();
 
 app.post("/supaglue_sync_webhook", async (req, res) => {
   if (req.body.type !== "SYNC_SUCCESS") {
@@ -14,25 +19,33 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
 
   const objectsToSync = [
     "users",
-    "accounts",
+    // "accounts",
     "leads",
     "opportunities",
     "contacts",
   ];
+
+  const syncStartTime = new Date();
 
   // Paginate and write by object type using SYNC_PARALLELISM concurrency
   while (objectsToSync.length) {
     const objectListNames = objectsToSync.splice(
       -1 * parseInt(SYNC_PARALLELISM, 10)
     );
+
     await Promise.all(
-      objectListNames.map((objectListName) =>
-        readAndWritePage(
+      objectListNames.map((objectListName) => {
+        const supagluePaginator = new SupagluePaginator({
           objectListName,
-          watermarkManager.get(objectListName),
-          watermarkManager.get(objectListName)
-        )
-      )
+          destination: isS3Destination
+            ? new S3Destination(objectListName, syncStartTime)
+            : new PrismaDestination(objectListName, syncStartTime),
+          incremental: isS3Destination ? false : true,
+          watermarkManager,
+        });
+
+        return supagluePaginator.start();
+      })
     );
   }
 
