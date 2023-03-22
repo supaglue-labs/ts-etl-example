@@ -2,6 +2,33 @@
 
 A simple implementation for syncing data from Supaglue's API to Postgres or AWS S3 (using Nodejs, Typescript, Express, Prisma, and Axios).
 
+You can 1-click deploy to Railway or run locally.
+
+## Run on Railway
+
+1. 1-click deploy to Railway:
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/A-cCrl)
+
+2. Enter these environment variables:
+   
+- `API_HOST`: your Supaglue API host
+- `API_KEY`: your Supaglue API key
+- `PROVIDER_NAME`: the CRM you are operating against
+- `CUSTOMER_ID`: the id of the customer created in Supaglue
+- `AWS_REGION`: the region of your AWS S3 bucket
+- `AWS_S3_BUCKET`: the AWS S3 bucket to write to (you will need PUT object access)
+- `AWS_ACCESS_KEY_ID`: your AWS IAM key
+- `AWS_SECRET_ACCESS_KEY`: your AWS IAM secret
+
+3. Once it's provisioned, grab your supaglue-syncer Railway domain using the steps below. This will be called by your Supaglue instance to start syncing records to S3.
+   
+![step-1](https://raw.githubusercontent.com/supaglue-labs/ts-etl-example/main/img/step1.png)
+
+![step-2](https://raw.githubusercontent.com/supaglue-labs/ts-etl-example/main/img/step2.png)
+
+4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) to create a webhook with the URL: `https://{your supaglue-syncer Railway domain from above}/supaglue_sync_webhook`
+
 ## Run locally
 
 1. Create an `.env` file from the provided sample:
