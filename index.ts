@@ -52,6 +52,10 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
   return res.send("ok");
 });
 
+app.get("/healthz", (req, res) => {
+  return res.send("ok");
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
