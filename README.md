@@ -1,4 +1,4 @@
-# ts-etl-example
+# typescript-syncer
 
 A simple implementation for syncing data from Supaglue's API to Postgres or AWS S3 (using Nodejs, Typescript, Express, Prisma, and Axios).
 
