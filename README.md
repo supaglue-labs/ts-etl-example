@@ -16,6 +16,9 @@ You can 1-click deploy to Railway or run locally.
 - `API_KEY`: your Supaglue API key
 - `PROVIDER_NAME`: the CRM you are operating against
 - `CUSTOMER_ID`: the id of the customer created in Supaglue
+
+(Optional) To write to AWS S3 instead of Postgres, enter these environment variables:
+
 - `AWS_REGION`: the region of your AWS S3 bucket
 - `AWS_S3_BUCKET`: the AWS S3 bucket to write to (you will need PUT object access)
 - `AWS_ACCESS_KEY_ID`: your AWS IAM key
@@ -27,7 +30,13 @@ You can 1-click deploy to Railway or run locally.
 
 ![step-2](https://raw.githubusercontent.com/supaglue-labs/ts-etl-example/main/img/step2.png)
 
-4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) to create a webhook with the URL: `https://{your supaglue-syncer Railway domain from above}/supaglue_sync_webhook`
+4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) to create a webhook with the URL: `https://{your typescript-syncer Railway domain from above}/supaglue_sync_webhook`
+
+5. (Optional) You can also manually trigger a sync by making a POST request to your instance of typescript-syncer:
+
+```shell
+curl https://{your typescript-syncer Railway domain}/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS"}'
+```
 
 ## Run locally
 
