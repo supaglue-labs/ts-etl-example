@@ -1,5 +1,4 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { Parser } from "json2csv";
 import { Destination } from ".";
 
 const client = new S3Client({
@@ -21,14 +20,16 @@ export class S3Destination implements Destination {
 
   async write(results: any[]): Promise<void> {
     if (results.length) {
-      const parser = new Parser();
-      const csv = parser.parse(results);
+      const ndjson = results
+        .map((result) => `${JSON.stringify(result)}`)
+        .join("\n");
+
       const command = new PutObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET!,
         Key: `${this.syncStartTime.toISOString()}/${
           this.objectListName
         }/${Date.now()}`,
-        Body: JSON.stringify(csv),
+        Body: ndjson,
       });
 
       await client.send(command);
