@@ -71,6 +71,8 @@ docker compose up
 curl localhost:3030/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
 ```
 
+Replace `<your_customer_id>` with the Supaglue customer you would like to sync.
+
 5. Postgres: Inspect the synced data in Postgres (password: `postgres`):
 
 ```shell
