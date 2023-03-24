@@ -8,7 +8,7 @@ You can 1-click deploy to Railway or run locally.
 
 1. 1-click deploy to Railway:
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/A-cCrl)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/IH6VTn?referralCode=_jOnzI)
 
 2. Enter these environment variables:
    
@@ -28,13 +28,15 @@ You can 1-click deploy to Railway or run locally.
 
 ![step-2](https://raw.githubusercontent.com/supaglue-labs/ts-etl-example/main/img/step2.png)
 
-4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) to create a webhook with the URL: `https://{your typescript-syncer Railway domain from above}/supaglue_sync_webhook`
+4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) to register a webhook with the URL: `https://{your typescript-syncer Railway domain from above}/supaglue_sync_webhook`
 
 5. (Optional) You can also manually trigger a sync by making a POST request to your instance of typescript-syncer:
 
 ```shell
-curl https://{your typescript-syncer Railway domain}/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS"}'
+curl localhost:3030/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
 ```
+
+Replace `<your_customer_id>` with the Supaglue customer you would like to sync.
 
 ## Run locally
 
