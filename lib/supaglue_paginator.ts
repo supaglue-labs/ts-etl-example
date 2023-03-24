@@ -12,6 +12,7 @@ const { AWS_S3_BUCKET } = process.env;
 
 export class SupagluePaginator {
   private objectListName: string;
+  private customerId: string;
   private startingUpdatedAt: Date;
   private destination: Destination;
   private incremental: boolean;
@@ -19,16 +20,19 @@ export class SupagluePaginator {
 
   constructor({
     objectListName,
+    customerId,
     destination,
     incremental,
     watermarkManager,
   }: {
     objectListName: string;
+    customerId: string;
     destination: Destination;
     incremental: boolean;
     watermarkManager: WatermarkManager;
   }) {
     this.objectListName = objectListName;
+    this.customerId = customerId;
     this.destination = destination;
     this.incremental = incremental;
     this.watermarkManager = watermarkManager;
@@ -45,6 +49,7 @@ export class SupagluePaginator {
 
     const response = await getSupagluePage(
       this.objectListName,
+      this.customerId,
       this.startingUpdatedAt,
       cursor
     );

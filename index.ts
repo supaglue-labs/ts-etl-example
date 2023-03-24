@@ -13,8 +13,8 @@ const { SYNC_PARALLELISM = "1", AWS_S3_BUCKET: isS3Destination } = process.env;
 const watermarkManager = new WatermarkManager();
 
 app.post("/supaglue_sync_webhook", async (req, res) => {
-  if (req.body.type !== "SYNC_SUCCESS") {
-    return res.status(400).send("not a sync success event");
+  if (req.body.type !== "SYNC_SUCCESS" || req.body.customer_id === undefined) {
+    return res.status(400).send("not a sync success event or no customer_id");
   }
 
   const objectsToSync = [
@@ -37,6 +37,7 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
       objectListNames.map((objectListName) => {
         const supagluePaginator = new SupagluePaginator({
           objectListName,
+          customerId: req.body.customer_id,
           destination: isS3Destination
             ? new S3Destination(objectListName, syncStartTime)
             : new PrismaDestination(objectListName, syncStartTime),

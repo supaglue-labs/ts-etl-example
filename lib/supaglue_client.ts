@@ -3,11 +3,11 @@ import querystring from "querystring";
 
 export async function getSupagluePage(
   objectListName: string,
+  customerId: string,
   startingUpdatedAt: Date,
   cursor?: string
 ): Promise<AxiosResponse<any, any>> {
-  const { API_HOST, API_KEY, CUSTOMER_ID, PROVIDER_NAME, PAGE_SIZE } =
-    process.env;
+  const { API_HOST, API_KEY, PROVIDER_NAME, PAGE_SIZE } = process.env;
 
   const config = {
     method: "get",
@@ -22,11 +22,18 @@ export async function getSupagluePage(
       },
     })}`,
     headers: {
-      "x-customer-id": CUSTOMER_ID,
+      "x-customer-id": customerId,
       "x-provider-name": PROVIDER_NAME,
       "x-api-key": API_KEY,
     },
   };
 
-  return await axios.request(config);
+  const response = await axios.request(config);
+
+  if (response.status >= 300 && response.status < 500) {
+    console.log("Request error", response.statusText);
+    throw new Error("Request error");
+  }
+
+  return response;
 }
