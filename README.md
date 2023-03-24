@@ -1,6 +1,6 @@
 # typescript-syncer
 
-A simple implementation for syncing data from Supaglue's API to Postgres or AWS S3 (using Nodejs, Typescript, Express, Prisma, and Axios).
+A simple implementation for syncing your customers' CRM data from Supaglue's API to Postgres or AWS S3 (using Nodejs, Typescript, Express, Prisma, and Axios).
 
 You can 1-click deploy to Railway or run locally.
 
