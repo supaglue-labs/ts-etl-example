@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "migrate": "prisma migrate dev",
-    "start": "yarn migrate && ts-node index.ts",
+    "start_for_postgres": "yarn migrate && ts-node index.ts",
+    "start_for_s3": "ts-node index.ts",
+    "start": "yarn start_for_postgres",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
