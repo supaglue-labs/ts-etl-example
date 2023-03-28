@@ -1,5 +1,6 @@
 services:
   - type: web
+    name: api
     env: node
     repo: https://github.com/supaglue-labs/typescript-syncer.git
     buildCommand: yarn install
