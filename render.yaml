@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: api
+    env: node
+    repo: https://render.com/deploy?repo=https://github.com/supaglue-labs/typescript-syncer.git
+    buildCommand: yarn install
+    startCommand: yarn start_for_s3
+    branch: main
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: API_HOST
+        sync: false
+      - key: API_KEY
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: PROVIDER_NAME
+        sync: false
+      - key: PAGE_SIZE
+        value: 1000
