@@ -29,14 +29,19 @@ Use `yarn start_for_s3` or `yarn start_for_postgres` to target different destina
 3. Trigger a sync to Postgres or S3 by making a POST request to your instance of typescript-syncer:
 
 ```shell
-curl localhost:3030/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
+curl https://{HOSTED-TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook \ 
+    -H 'content-type: application/json' \ 
+    -d '{"type":"SYNC_SUCCESS", "customer_id": "{YOUR_SUPAGLUE_CUSTOMER_ID}"}'
 ```
 
-Replace `<your_customer_id>` with the Supaglue customer you would like to sync.
+Replace:
+
+- `{HOSTED-TYPESCRIPT-SYNCER-URL}`: the URL your typescript-syncer is hosted at.
+- `{YOUR_SUPAGLUE_CUSTOMER_ID}`: with the Supaglue customer you would like to sync.
 
 (Optional) 4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) or Supaglue Management Portal to register the typescript-syncer's webhook so it syncs automatically:
 
-`https://{TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook`
+`https://{HOSTED-TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook`
 
 ## Run locally (sync to Postgres)
 
@@ -72,7 +77,9 @@ docker compose up
 4. Trigger the webhook endpoint with a POST curl:
 
 ```shell
-curl localhost:3030/supaglue_sync_webhook -H 'content-type: application/json' -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
+curl localhost:3030/supaglue_sync_webhook \ 
+    -H 'content-type: application/json' \ 
+    -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
 ```
 
 Replace `<your_customer_id>` with the Supaglue customer you would like to sync.
