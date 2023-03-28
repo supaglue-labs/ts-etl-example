@@ -2,7 +2,7 @@
 
 A simple implementation for syncing your customers' CRM data from Supaglue's API to Postgres or AWS S3 (using Nodejs, Typescript, Express, Prisma, and Axios).
 
-You can 1-click deploy to Railway or run locally.
+You can 1-click deploy to a cloud hosting platform or run it locally.
 
 ## Cloud
 
