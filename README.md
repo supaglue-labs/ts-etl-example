@@ -9,20 +9,20 @@ You can 1-click deploy to Railway or run locally.
 1. 1-click deploy:
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/IH6VTn?referralCode=_jOnzI)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/supaglue-labs/typescript-syncer)
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/supaglue-labs/typescript-syncer)
 
 2. Enter these environment variables:
    
-- `API_HOST`: your Supaglue API host
-- `API_KEY`: your Supaglue API key
-- `PROVIDER_NAME`: the CRM you are operating against
+- `API_HOST`: your Supaglue API host.
+- `API_KEY`: your Supaglue API key.
+- `PROVIDER_NAME`: the CRM your customer is using.
 
 (Optional) To write to AWS S3 instead of Postgres, enter these environment variables:
-- `AWS_REGION`: the region of your AWS S3 bucket
-- `AWS_S3_BUCKET`: the AWS S3 bucket to write to (you will need PUT object access)
-- `AWS_ACCESS_KEY_ID`: your AWS IAM key
-- `AWS_SECRET_ACCESS_KEY`: your AWS IAM secret
+- `AWS_REGION`: the region of your AWS S3 bucket.
+- `AWS_S3_BUCKET`: the AWS S3 bucket to write to (you will need PUT object access).
+- `AWS_ACCESS_KEY_ID`: your AWS IAM key.
+- `AWS_SECRET_ACCESS_KEY`: your AWS IAM secret.
 
 Use `yarn start_for_s3` or `yarn start_for_postgres` to target different destinations.
 
@@ -36,7 +36,7 @@ Replace `<your_customer_id>` with the Supaglue customer you would like to sync.
 
 (Optional) 4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) or Supaglue Management Portal to register the typescript-syncer's webhook so it syncs automatically:
 
-https://{TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook
+`https://{TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook`
 
 ## Run locally (sync to Postgres)
 
