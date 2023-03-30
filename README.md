@@ -29,8 +29,8 @@ Use `yarn start_for_s3` or `yarn start_for_postgres` to target different destina
 3. Trigger a sync to Postgres or S3 by making a POST request to your instance of typescript-syncer:
 
 ```shell
-curl https://{HOSTED-TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook \ 
-    -H 'content-type: application/json' \ 
+curl -XPOST https://{HOSTED-TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook \
+    -H 'content-type: application/json' \
     -d '{"type":"SYNC_SUCCESS", "customer_id": "{YOUR_SUPAGLUE_CUSTOMER_ID}"}'
 ```
 
@@ -77,8 +77,8 @@ docker compose up
 4. Trigger the webhook endpoint with a POST curl:
 
 ```shell
-curl localhost:3030/supaglue_sync_webhook \ 
-    -H 'content-type: application/json' \ 
+curl -XPOST localhost:3030/supaglue_sync_webhook \
+    -H 'content-type: application/json' \
     -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
 ```
 
