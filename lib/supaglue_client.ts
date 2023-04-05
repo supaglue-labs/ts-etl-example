@@ -4,6 +4,7 @@ import querystring from "querystring";
 export async function getSupagluePage(
   objectListName: string,
   customerId: string,
+  providerName: string,
   startingLastModifiedAt: Date,
   cursor?: string
 ): Promise<AxiosResponse<any, any>> {
@@ -23,7 +24,7 @@ export async function getSupagluePage(
     })}`,
     headers: {
       "x-customer-id": customerId,
-      "x-provider-name": PROVIDER_NAME,
+      "x-provider-name": providerName,
       "x-api-key": API_KEY,
     },
   };
