@@ -13,6 +13,10 @@ const { SYNC_PARALLELISM = "1", AWS_S3_BUCKET: isS3Destination } = process.env;
 const watermarkManager = new WatermarkManager();
 
 app.post("/supaglue_sync_webhook", async (req, res) => {
+  console.log("incoming event", {
+    type: req.body?.type,
+    payload: req.body?.payload,
+  });
   if (
     req.body.type !== "SYNC_SUCCESS" ||
     !req.body?.payload?.customer_id ||
