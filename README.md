@@ -16,7 +16,6 @@ You can 1-click deploy to a cloud hosting platform or run it locally.
    
 - `API_HOST`: your Supaglue API host.
 - `API_KEY`: your Supaglue API key.
-- `PROVIDER_NAME`: the CRM your customer is using.
 
 (Optional) To write to AWS S3 instead of Postgres, enter these environment variables:
 - `AWS_REGION`: the region of your AWS S3 bucket.
@@ -26,18 +25,19 @@ You can 1-click deploy to a cloud hosting platform or run it locally.
 
 Use `yarn start_for_s3` or `yarn start_for_postgres` to target different destinations.
 
-3. Trigger a sync to Postgres or S3 by making a POST request to your instance of typescript-syncer:
+1. Trigger a sync to Postgres or S3 by making a POST request to your instance of typescript-syncer:
 
 ```shell
 curl -XPOST https://{HOSTED-TYPESCRIPT-SYNCER-URL}/supaglue_sync_webhook \
     -H 'content-type: application/json' \
-    -d '{"type":"SYNC_SUCCESS", "customer_id": "{YOUR_SUPAGLUE_CUSTOMER_ID}"}'
+    -d '{"type":"SYNC_SUCCESS", "payload": { "customer_id": "{YOUR_SUPAGLUE_CUSTOMER_ID}", "provider_name": "{YOUR_CUSTOMERS_CRM_PROVIDER}" } }'
 ```
 
 Replace:
 
 - `{HOSTED-TYPESCRIPT-SYNCER-URL}`: the URL your typescript-syncer is hosted at.
 - `{YOUR_SUPAGLUE_CUSTOMER_ID}`: with the Supaglue customer you would like to sync.
+- `{YOUR_CUSTOMERS_CRM_PROVIDER}`: the CRM your customer is using.
 
 (Optional) 4. Use the Supaglue [Management API's Webhook endpoints](https://docs.supaglue.com/api/mgmt#tag/Webhook/operation/createWebhook) or Supaglue Management Portal to register the typescript-syncer's webhook so it syncs automatically:
 
@@ -55,7 +55,6 @@ cp .env.sample .env
 
 - `API_HOST`: your Supaglue API host
 - `API_KEY`: your Supaglue API key
-- `PROVIDER_NAME`: the CRM you are operating against
 - `PAGE_SIZE`: how many records to fetch per request 
 
 By default this example app will write to Postgres. If you would like to write to S3 instead, fill in the environment variables below:
@@ -79,10 +78,13 @@ docker compose up
 ```shell
 curl -XPOST localhost:3030/supaglue_sync_webhook \
     -H 'content-type: application/json' \
-    -d '{"type":"SYNC_SUCCESS", "customer_id": "<your_customer_id>"}'
+    -d '{"type":"SYNC_SUCCESS", "payload": { "customer_id": "{YOUR_SUPAGLUE_CUSTOMER_ID}", "provider_name": "{YOUR_CUSTOMERS_CRM_PROVIDER}" } }'
 ```
 
-Replace `<your_customer_id>` with the Supaglue customer you would like to sync.
+Replace:
+
+- `{YOUR_SUPAGLUE_CUSTOMER_ID}`: with the Supaglue customer you would like to sync.
+- `{YOUR_CUSTOMERS_CRM_PROVIDER}`: the CRM your customer is using.
 
 5. Postgres: Inspect the synced data in Postgres (password: `postgres`):
 

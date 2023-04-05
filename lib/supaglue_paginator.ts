@@ -2,7 +2,7 @@ import {
   debugLogRequestEnd,
   debugLogRequestStart,
   debugLogWriteEnd,
-  debugLogWriteStart
+  debugLogWriteStart,
 } from "./debug";
 import { Destination } from "./destinations";
 import { getSupagluePage } from "./supaglue_client";
@@ -13,6 +13,7 @@ const { AWS_S3_BUCKET } = process.env;
 export class SupagluePaginator {
   private objectListName: string;
   private customerId: string;
+  private providerName: string;
   private startingLastModifiedAt: Date;
   private destination: Destination;
   private incremental: boolean;
@@ -21,22 +22,27 @@ export class SupagluePaginator {
   constructor({
     objectListName,
     customerId,
+    providerName,
     destination,
     incremental,
     watermarkManager,
   }: {
     objectListName: string;
     customerId: string;
+    providerName: string;
     destination: Destination;
     incremental: boolean;
     watermarkManager: WatermarkManager;
   }) {
     this.objectListName = objectListName;
     this.customerId = customerId;
+    this.providerName = providerName;
     this.destination = destination;
     this.incremental = incremental;
     this.watermarkManager = watermarkManager;
-    this.startingLastModifiedAt = this.watermarkManager.get(this.objectListName);
+    this.startingLastModifiedAt = this.watermarkManager.get(
+      this.objectListName
+    );
   }
 
   async start() {
@@ -44,12 +50,16 @@ export class SupagluePaginator {
   }
 
   // Make a http request to the Supaglue API, transactionally write that to the database, update the watermark, then paginate if there are more pages.
-  private async readAndWritePage(maxLastModifiedAtSoFar: Date, cursor?: string) {
+  private async readAndWritePage(
+    maxLastModifiedAtSoFar: Date,
+    cursor?: string
+  ) {
     const requestStartEpoch = debugLogRequestStart(this.objectListName);
 
     const response = await getSupagluePage(
       this.objectListName,
       this.customerId,
+      this.providerName,
       this.startingLastModifiedAt,
       cursor
     );
@@ -66,7 +76,9 @@ export class SupagluePaginator {
 
     // Keep track of the running lastModifiedAt watermark for this sync to set at the end.
     response.data.results.forEach((result: any) => {
-      if (Date.parse(result.last_modified_at) > maxLastModifiedAtSoFar.getTime()) {
+      if (
+        Date.parse(result.last_modified_at) > maxLastModifiedAtSoFar.getTime()
+      ) {
         maxLastModifiedAtSoFar = new Date(result.last_modified_at);
       }
     });
