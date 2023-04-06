@@ -39,12 +39,14 @@ export class SupagluePaginator {
     this.incremental = incremental;
     this.watermarkManager = watermarkManager;
     this.startingLastModifiedAt = this.watermarkManager.get(
-      this.objectListName
+      this.objectListName,
+      this.customerId,
+      this.providerName
     );
   }
 
   async start() {
-    await this.readAndWritePage(this.watermarkManager.get(this.objectListName));
+    await this.readAndWritePage(this.startingLastModifiedAt);
   }
 
   // Make a http request to the Supaglue API, transactionally write that to the database, update the watermark, then paginate if there are more pages.
@@ -58,7 +60,7 @@ export class SupagluePaginator {
       this.objectListName,
       this.customerId,
       this.providerName,
-      this.startingLastModifiedAt,
+      maxLastModifiedAtSoFar,
       cursor
     );
 
@@ -88,7 +90,7 @@ export class SupagluePaginator {
     } else {
       if (this.incremental) {
         // Supaglue list endpoints are ordered by id so we can only set a new watermark if we've paginated through all pages.
-        this.watermarkManager.set(this.objectListName, maxLastModifiedAtSoFar);
+        this.watermarkManager.set(this.objectListName, this.customerId, this.providerName, maxLastModifiedAtSoFar);
       }
     }
   }
