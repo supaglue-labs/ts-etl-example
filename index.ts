@@ -11,7 +11,7 @@ const { AWS_S3_BUCKET: isS3Destination } = process.env;
 
 // Persist this for the duration that the server is running.
 const watermarkManager = new WatermarkManager();
-const supagluePaginatorMap: Record<string, SupagluePaginator> = {};
+const paginators: SupagluePaginator[] = [];
 
 const supportedCommonModels = [
   'account',
@@ -56,9 +56,18 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
 
   const objectListName = commonModelToObjectListName[commonModel];
 
-  // Check to see if we're already syncing this object type
-  if (supagluePaginatorMap[objectListName]) {
-    console.log('already syncing', objectListName);
+
+  // Check to see if we're already syncing this object/customer/provider
+  const existingPaginator = paginators.find((paginator) => {
+    return (
+      paginator.objectListName === objectListName &&
+      paginator.customerId === customerId &&
+      paginator.providerName === providerName
+    );
+  });
+
+  if (existingPaginator) {
+    console.log('already syncing', objectListName, customerId, providerName);
     return res.status(200).send('already syncing');
   }
 
@@ -76,12 +85,13 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
     watermarkManager,
   });
 
-  supagluePaginatorMap[objectListName] = supagluePaginator;
+  paginators.push(supagluePaginator);
+  
   supagluePaginator.start().catch((err) => {
     console.error('error syncing', objectListName, err);
   }).finally(() => {
     // Clean up when done
-    delete supagluePaginatorMap[objectListName];
+    paginators.splice(paginators.indexOf(supagluePaginator), 1);
   });
 
   return res.send("ok");
