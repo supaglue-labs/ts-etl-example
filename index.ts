@@ -51,6 +51,7 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
 
   if (!supportedCommonModels.includes(commonModel)) {
     console.log('sync event for object type not supported', commonModel);
+    return res.status(400).send('sync event for object type not supported');
   }
 
   const objectListName = commonModelToObjectListName[commonModel];
