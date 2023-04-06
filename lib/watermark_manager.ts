@@ -16,10 +16,14 @@ export class WatermarkManager {
   }
 
   set(objectListName: string, customerId: string, providerName: string, date: Date) {
-    const existingWatermark = this.get(objectListName, customerId, providerName);
+    const existingWatermark = this.maxLastModifiedAtList.find((watermark) =>
+      watermark.objectListName === objectListName &&
+      watermark.customerId === customerId &&
+      watermark.providerName === providerName
+    );
 
     if (existingWatermark) {
-      existingWatermark.maxLastModifiedAt = date;
+      existingWatermark.date = date;
       return;
     }
 
@@ -27,7 +31,7 @@ export class WatermarkManager {
       objectListName,
       customerId,
       providerName,
-      date: date,
+      date,
     });
   }
 }

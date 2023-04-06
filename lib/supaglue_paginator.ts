@@ -54,23 +54,25 @@ export class SupagluePaginator {
     maxLastModifiedAtSoFar: Date,
     cursor?: string
   ) {
-    const requestStartEpoch = debugLogRequestStart(this.objectListName);
+    const requestStartEpoch = debugLogRequestStart(this.objectListName, this.customerId, this.providerName);
 
     const response = await getSupagluePage(
       this.objectListName,
       this.customerId,
       this.providerName,
-      maxLastModifiedAtSoFar,
+      this.startingLastModifiedAt,
       cursor
     );
 
     debugLogRequestEnd(
       this.objectListName,
+      this.customerId,
+      this.providerName,
       requestStartEpoch,
       response.data.results.length
     );
 
-    const writeStartEpoch = debugLogWriteStart(this.objectListName);
+    const writeStartEpoch = debugLogWriteStart(this.objectListName, this.customerId, this.providerName);
 
     await this.destination.write(response.data.results);
 
@@ -83,7 +85,7 @@ export class SupagluePaginator {
       }
     });
 
-    debugLogWriteEnd(this.objectListName, writeStartEpoch);
+    debugLogWriteEnd(this.objectListName, this.customerId, this.providerName, writeStartEpoch);
 
     if (response.data.next) {
       await this.readAndWritePage(maxLastModifiedAtSoFar, response.data.next);
