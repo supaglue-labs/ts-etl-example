@@ -39,12 +39,14 @@ export class SupagluePaginator {
     this.incremental = incremental;
     this.watermarkManager = watermarkManager;
     this.startingLastModifiedAt = this.watermarkManager.get(
-      this.objectListName
+      this.objectListName,
+      this.customerId,
+      this.providerName
     );
   }
 
   async start() {
-    await this.readAndWritePage(this.watermarkManager.get(this.objectListName));
+    await this.readAndWritePage(this.startingLastModifiedAt);
   }
 
   // Make a http request to the Supaglue API, transactionally write that to the database, update the watermark, then paginate if there are more pages.
@@ -52,7 +54,7 @@ export class SupagluePaginator {
     maxLastModifiedAtSoFar: Date,
     cursor?: string
   ) {
-    const requestStartEpoch = debugLogRequestStart(this.objectListName);
+    const requestStartEpoch = debugLogRequestStart(this.objectListName, this.customerId, this.providerName);
 
     const response = await getSupagluePage(
       this.objectListName,
@@ -64,11 +66,13 @@ export class SupagluePaginator {
 
     debugLogRequestEnd(
       this.objectListName,
+      this.customerId,
+      this.providerName,
       requestStartEpoch,
       response.data.results.length
     );
 
-    const writeStartEpoch = debugLogWriteStart(this.objectListName);
+    const writeStartEpoch = debugLogWriteStart(this.objectListName, this.customerId, this.providerName);
 
     await this.destination.write(response.data.results);
 
@@ -81,14 +85,14 @@ export class SupagluePaginator {
       }
     });
 
-    debugLogWriteEnd(this.objectListName, writeStartEpoch);
+    debugLogWriteEnd(this.objectListName, this.customerId, this.providerName, writeStartEpoch);
 
     if (response.data.next) {
       await this.readAndWritePage(maxLastModifiedAtSoFar, response.data.next);
     } else {
       if (this.incremental) {
         // Supaglue list endpoints are ordered by id so we can only set a new watermark if we've paginated through all pages.
-        this.watermarkManager.set(this.objectListName, maxLastModifiedAtSoFar);
+        this.watermarkManager.set(this.objectListName, this.customerId, this.providerName, maxLastModifiedAtSoFar);
       }
     }
   }

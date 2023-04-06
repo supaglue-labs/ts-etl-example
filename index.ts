@@ -56,7 +56,6 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
 
   const objectListName = commonModelToObjectListName[commonModel];
 
-
   // Check to see if we're already syncing this object/customer/provider
   const existingPaginator = paginators.find((paginator) => {
     return (
