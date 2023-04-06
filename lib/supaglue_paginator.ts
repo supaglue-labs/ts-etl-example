@@ -8,12 +8,10 @@ import { Destination } from "./destinations";
 import { getSupagluePage } from "./supaglue_client";
 import { WatermarkManager } from "./watermark_manager";
 
-const { AWS_S3_BUCKET } = process.env;
-
 export class SupagluePaginator {
-  private objectListName: string;
-  private customerId: string;
-  private providerName: string;
+  public readonly objectListName: string;
+  public readonly customerId: string;
+  public readonly providerName: string;
   private startingLastModifiedAt: Date;
   private destination: Destination;
   private incremental: boolean;
