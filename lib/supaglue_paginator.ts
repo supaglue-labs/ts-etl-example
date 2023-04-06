@@ -54,44 +54,44 @@ export class SupagluePaginator {
     maxLastModifiedAtSoFar: Date,
     cursor?: string
   ) {
-    do {
-      const requestStartEpoch = debugLogRequestStart(this.objectListName);
+    const requestStartEpoch = debugLogRequestStart(this.objectListName);
 
-      const response = await getSupagluePage(
-        this.objectListName,
-        this.customerId,
-        this.providerName,
-        this.startingLastModifiedAt,
-        cursor
-      );
-  
-      debugLogRequestEnd(
-        this.objectListName,
-        requestStartEpoch,
-        response.data.results.length
-      );
-  
-      const writeStartEpoch = debugLogWriteStart(this.objectListName);
-  
-      await this.destination.write(response.data.results);
-  
-      // Keep track of the running lastModifiedAt watermark for this sync to set at the end.
-      response.data.results.forEach((result: any) => {
-        if (
-          Date.parse(result.last_modified_at) > maxLastModifiedAtSoFar.getTime()
-        ) {
-          maxLastModifiedAtSoFar = new Date(result.last_modified_at);
-        }
-      });
-  
-      debugLogWriteEnd(this.objectListName, writeStartEpoch);
+    const response = await getSupagluePage(
+      this.objectListName,
+      this.customerId,
+      this.providerName,
+      this.startingLastModifiedAt,
+      cursor
+    );
 
-      cursor = response.data.next;
-    } while (cursor);
+    debugLogRequestEnd(
+      this.objectListName,
+      requestStartEpoch,
+      response.data.results.length
+    );
 
-    if (this.incremental) {
-      // Supaglue list endpoints are ordered by id so we can only set a new watermark if we've paginated through all pages.
-      this.watermarkManager.set(this.objectListName, maxLastModifiedAtSoFar);
+    const writeStartEpoch = debugLogWriteStart(this.objectListName);
+
+    await this.destination.write(response.data.results);
+
+    // Keep track of the running lastModifiedAt watermark for this sync to set at the end.
+    response.data.results.forEach((result: any) => {
+      if (
+        Date.parse(result.last_modified_at) > maxLastModifiedAtSoFar.getTime()
+      ) {
+        maxLastModifiedAtSoFar = new Date(result.last_modified_at);
+      }
+    });
+
+    debugLogWriteEnd(this.objectListName, writeStartEpoch);
+
+    if (response.data.next) {
+      await this.readAndWritePage(maxLastModifiedAtSoFar, response.data.next);
+    } else {
+      if (this.incremental) {
+        // Supaglue list endpoints are ordered by id so we can only set a new watermark if we've paginated through all pages.
+        this.watermarkManager.set(this.objectListName, maxLastModifiedAtSoFar);
+      }
     }
   }
 }
