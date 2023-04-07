@@ -1,37 +1,43 @@
+import { PrismaClient } from '@prisma/client';
+
 // Keep a watermark for each object type. The set() watermark can be persisted for durability or reset() to trigger a full sync.
 export class WatermarkManager {
-  private maxLastModifiedAtList: {
-    objectListName: string;
-    customerId: string;
-    providerName: string;
-    date: Date;
-  }[] = [];
-
-  get(objectListName: string, customerId: string, providerName: string): any {
-    return this.maxLastModifiedAtList.find((watermark) => 
-      watermark.objectListName === objectListName &&
-      watermark.customerId === customerId &&
-      watermark.providerName === providerName
-    )?.date ?? new Date(0);
+  #prisma: PrismaClient;
+  constructor() {
+    this.#prisma = new PrismaClient();
   }
 
-  set(objectListName: string, customerId: string, providerName: string, date: Date) {
-    const existingWatermark = this.maxLastModifiedAtList.find((watermark) =>
-      watermark.objectListName === objectListName &&
-      watermark.customerId === customerId &&
-      watermark.providerName === providerName
-    );
+  async get(objectListName: string, customerId: string, providerName: string): Promise<Date> {
+    const res = await this.#prisma.watermarks.findUnique({
+      where: {
+        customerId_providerName_commonModel: {
+          customerId,
+          providerName,
+          commonModel: objectListName,
+        },
+      },
+    });
+    return res?.watermark ?? new Date(0);
+  }
 
-    if (existingWatermark) {
-      existingWatermark.date = date;
-      return;
-    }
-
-    this.maxLastModifiedAtList.push({
-      objectListName,
-      customerId,
-      providerName,
-      date,
+  async set(objectListName: string, customerId: string, providerName: string, date: Date) {
+    await this.#prisma.watermarks.upsert({
+      where: {
+        customerId_providerName_commonModel: {
+          customerId,
+          providerName,
+          commonModel: objectListName,
+        },
+      },
+      update: {
+        watermark: date,
+      },
+      create: {
+        customerId,
+        providerName,
+        commonModel: objectListName,
+        watermark: date,
+      },
     });
   }
 }

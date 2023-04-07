@@ -1,6 +1,13 @@
-export function debugLogRequestStart(objectListName: string, customerId: string, providerName: string) {
+export function debugLogRequestStart(
+  objectListName: string,
+  customerId: string,
+  providerName: string,
+  startingLastModifiedAt: Date,
+) {
   const requestStartTime = Date.now();
-  console.log(`request started for ${objectListName}, ${customerId}, ${providerName}`);
+  console.log(
+    `request started for ${objectListName}, ${customerId}, ${providerName}, ${startingLastModifiedAt.toISOString()}`,
+  );
   return requestStartTime;
 }
 
@@ -9,14 +16,13 @@ export function debugLogRequestEnd(
   customerId: string,
   providerName: string,
   startEpoch: number,
-  numRecords: number
+  numRecords: number,
+  startingLastModifiedAt: Date,
 ) {
+  console.log(`request finished for ${objectListName}. elapsed: ${Date.now() - startEpoch}ms. ${numRecords} records.`);
   console.log(
-    `request finished for ${objectListName}. elapsed: ${
-      Date.now() - startEpoch
-    }ms. ${numRecords} records.`
+    `writing started for ${objectListName}, ${customerId}, ${providerName}, ${startingLastModifiedAt.toISOString()}`,
   );
-  console.log(`writing started for ${objectListName}, ${customerId}, ${providerName}`);
   const writeStartTime = Date.now();
 }
 
@@ -28,8 +34,6 @@ export function debugLogWriteStart(objectListName: string, customerId: string, p
 
 export function debugLogWriteEnd(objectListName: string, customerId: string, providerName: string, startEpoch: number) {
   console.log(
-    `write finished for ${objectListName}, ${customerId}, ${providerName}. elapsed: ${
-      Date.now() - startEpoch
-    }ms.`
+    `write finished for ${objectListName}, ${customerId}, ${providerName}. elapsed: ${Date.now() - startEpoch}ms.`,
   );
 }

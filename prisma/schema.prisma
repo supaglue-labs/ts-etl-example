@@ -50,6 +50,17 @@ model CrmAccount {
   @@map("crm_accounts")
 }
 
+model Watermarks {
+  id           String    @id @default(uuid())
+  customerId   String    @map("customer_id")
+  providerName String    @map("provider_name")
+  commonModel  String    @map("common_model")
+  watermark    DateTime?
+
+  @@unique([customerId, providerName, commonModel])
+  @@map("watermarks")
+}
+
 //
 // Your application tables
 //
