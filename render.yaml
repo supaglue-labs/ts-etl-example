@@ -23,3 +23,5 @@ services:
         sync: false
       - key: PAGE_SIZE
         value: 1000
+      - key: IS_INCREMENTAL
+        value: true
