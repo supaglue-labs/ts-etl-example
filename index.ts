@@ -1,8 +1,8 @@
-import express from 'express';
-import { PrismaDestination } from './lib/destinations/prisma';
-import { S3Destination } from './lib/destinations/s3';
-import { SupagluePaginator } from './lib/supaglue_paginator';
-import { WatermarkManager } from './lib/watermark_manager';
+import express from "express";
+import { PrismaDestination } from "./lib/destinations/prisma";
+import { S3Destination } from "./lib/destinations/s3";
+import { SupagluePaginator } from "./lib/supaglue_paginator";
+import { WatermarkManager } from "./lib/watermark_manager";
 
 const app = express();
 app.use(express.json());
@@ -13,7 +13,13 @@ const { AWS_S3_BUCKET: isS3Destination } = process.env;
 const watermarkManager = new WatermarkManager();
 const paginators: SupagluePaginator[] = [];
 
-const supportedCommonModels = ['account', 'contact', 'lead', 'opportunity', 'user'];
+const supportedCommonModels = [
+  'account',
+  'contact',
+  'lead',
+  'opportunity',
+  'user',
+];
 
 const commonModelToObjectListName: Record<string, string> = {
   account: 'accounts',
@@ -23,27 +29,29 @@ const commonModelToObjectListName: Record<string, string> = {
   user: 'users',
 };
 
-app.post('/supaglue_sync_webhook', async (req, res) => {
-  console.log('incoming event', {
+app.post("/supaglue_sync_webhook", async (req, res) => {
+  console.log("incoming event", {
     type: req.body?.type,
     payload: req.body?.payload,
   });
   if (
-    req.body.type !== 'SYNC_SUCCESS' ||
+    req.body.type !== "SYNC_SUCCESS" ||
     !req.body?.payload?.customer_id ||
     !req.body?.payload?.provider_name ||
     !req.body?.payload?.common_model
   ) {
-    return res.status(200).send('not a sync success event or no customer_id/provider_name/common_model');
+    return res
+      .status(200)
+      .send("not a sync success event or no customer_id/provider_name/common_model");
   }
 
   const customerId = req.body.payload.customer_id;
   const providerName = req.body.payload.provider_name;
   const commonModel = req.body.payload.common_model;
-
+  
   if (providerName !== 'hubspot') {
-    console.log('only syncing hubspot for now');
-    return res.status(200).send('only syncing hubspot for now');
+    console.log("only hubspot is supported");
+    return res.status(200).send('only hubspot is supported');
   }
 
   if (!supportedCommonModels.includes(commonModel)) {
@@ -82,22 +90,19 @@ app.post('/supaglue_sync_webhook', async (req, res) => {
   });
 
   paginators.push(supagluePaginator);
+  
+  supagluePaginator.start().catch((err) => {
+    console.error('error syncing', objectListName, err);
+  }).finally(() => {
+    // Clean up when done
+    paginators.splice(paginators.indexOf(supagluePaginator), 1);
+  });
 
-  supagluePaginator
-    .start()
-    .catch((err) => {
-      console.error('error syncing', objectListName, err);
-    })
-    .finally(() => {
-      // Clean up when done
-      paginators.splice(paginators.indexOf(supagluePaginator), 1);
-    });
-
-  return res.send('ok');
+  return res.send("ok");
 });
 
-app.get('/healthz', (req, res) => {
-  return res.send('ok');
+app.get("/healthz", (req, res) => {
+  return res.send("ok");
 });
 
 app.listen(port, () => {
