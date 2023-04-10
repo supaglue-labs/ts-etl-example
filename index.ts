@@ -48,6 +48,11 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
   const customerId = req.body.payload.customer_id;
   const providerName = req.body.payload.provider_name;
   const commonModel = req.body.payload.common_model;
+  
+  if (providerName !== 'hubspot') {
+    console.log("only hubspot is supported");
+    return res.status(200).send('only hubspot is supported');
+  }
 
   if (!supportedCommonModels.includes(commonModel)) {
     console.log('sync event for object type not supported', commonModel);
