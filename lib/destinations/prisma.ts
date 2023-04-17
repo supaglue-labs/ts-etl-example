@@ -59,7 +59,7 @@ export class PrismaDestination implements Destination {
     return;
   }
 
-  async write(results: any[]) {
+  async write(results: Record<string, any>[]) {
     const delegate = getPrismaDelegate(prisma, this.objectListName);
 
     await prisma.$transaction(
