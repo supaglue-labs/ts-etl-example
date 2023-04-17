@@ -67,7 +67,7 @@ export class S3Destination implements Destination {
     });
     if (results.length) {
       const ndjson = results
-        .map((result) => `${JSON.stringify(result)}`)
+        .map((result) => JSON.stringify(result))
         .join("\n");
 
       const command = new PutObjectCommand({
