@@ -83,7 +83,7 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
     customerId,
     providerName,
     destination: isS3Destination
-      ? new S3Destination(objectListName, syncStartTime)
+      ? new S3Destination(objectListName, customerId, providerName, syncStartTime)
       : new PrismaDestination(objectListName, syncStartTime),
     incremental: isS3Destination ? false : true,
     watermarkManager,

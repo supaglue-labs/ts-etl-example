@@ -46,6 +46,7 @@ export class SupagluePaginator {
   }
 
   async start() {
+    await this.destination.dropExistingRecordsIfNecessary();
     await this.readAndWritePage(this.startingLastModifiedAt);
   }
 

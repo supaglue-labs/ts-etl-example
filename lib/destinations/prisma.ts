@@ -54,6 +54,10 @@ export class PrismaDestination implements Destination {
     this.objectListName = objectListName;
     this.syncStartTime = syncStartTime;
   }
+  
+  async dropExistingRecordsIfNecessary() {
+    return;
+  }
 
   async write(results: any[]) {
     const delegate = getPrismaDelegate(prisma, this.objectListName);
