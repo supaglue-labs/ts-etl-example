@@ -8,7 +8,7 @@ export async function getSupagluePage(
   startingLastModifiedAt: Date,
   cursor?: string
 ): Promise<AxiosResponse<any, any>> {
-  const { API_HOST, API_KEY, PROVIDER_NAME, PAGE_SIZE = 1000 } = process.env;
+  const { API_HOST, API_KEY, PAGE_SIZE = 1000 } = process.env;
 
   const config = {
     method: "get",
