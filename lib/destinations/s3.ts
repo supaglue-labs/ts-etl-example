@@ -49,6 +49,9 @@ export class S3Destination implements Destination {
         customerId: this.customerId,
         providerName: this.providerName,
       });
+      if (!keys.length) {
+        continue;
+      }
       const command = new DeleteObjectsCommand({
         Bucket: process.env.AWS_S3_BUCKET!,
         Delete: {
@@ -59,7 +62,7 @@ export class S3Destination implements Destination {
     }
   }
 
-  async write(results: any[]): Promise<void> {
+  async write(results: Record<string, any>[]): Promise<void> {
     console.log('Writing S3 objects', {
       objectListName: this.objectListName,
       customerId: this.customerId,
@@ -67,7 +70,11 @@ export class S3Destination implements Destination {
     });
     if (results.length) {
       const ndjson = results
-        .map((result) => JSON.stringify(result))
+        .map((result) => JSON.stringify({
+          ...result,
+          customer_id: this.customerId,
+          provider_name: this.providerName
+        }))
         .join("\n");
 
       const command = new PutObjectCommand({

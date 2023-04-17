@@ -3,5 +3,5 @@ export interface DestinationConstructor {
 }
 export interface Destination {
   dropExistingRecordsIfNecessary: () => Promise<void>;
-  write: (results: any[]) => Promise<void>;
+  write: (results: Record<string, any>[]) => Promise<void>;
 }
