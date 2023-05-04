@@ -7,7 +7,7 @@ import { WatermarkManager } from "./lib/watermark_manager";
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3030;
-const { AWS_S3_BUCKET: isS3Destination, IS_INCREMENTAL = true } = process.env;
+const { AWS_S3_BUCKET: isS3Destination, IS_INCREMENTAL = "true" } = process.env;
 
 // Persist this for the duration that the server is running.
 const watermarkManager = new WatermarkManager();
@@ -87,7 +87,7 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
           syncStartTime
         )
       : new PrismaDestination(objectListName, syncStartTime),
-    incremental: Boolean(IS_INCREMENTAL),
+    incremental: IS_INCREMENTAL === "true" || IS_INCREMENTAL === "1",
     watermarkManager,
   });
 
