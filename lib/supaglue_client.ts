@@ -15,7 +15,7 @@ export async function getSupagluePage(
     maxBodyLength: Infinity,
     url: `${API_HOST}/crm/v1/${objectListName}?${querystring.stringify({
       page_size: PAGE_SIZE,
-      include_raw_data: true,
+      // include_raw_data: true,
       modified_after: startingLastModifiedAt.toISOString(),
       ...{
         ...(cursor && {

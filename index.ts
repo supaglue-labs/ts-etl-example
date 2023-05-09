@@ -1,4 +1,5 @@
 import express from "express";
+import { ChromaDestination } from "./lib/destinations/chroma";
 import { PrismaDestination } from "./lib/destinations/prisma";
 import { S3Destination } from "./lib/destinations/s3";
 import { SupagluePaginator } from "./lib/supaglue_paginator";
@@ -7,7 +8,7 @@ import { WatermarkManager } from "./lib/watermark_manager";
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3030;
-const { AWS_S3_BUCKET: isS3Destination, IS_INCREMENTAL = "true" } = process.env;
+const { IS_INCREMENTAL = "true" } = process.env;
 
 // Persist this for the duration that the server is running.
 const watermarkManager = new WatermarkManager();
@@ -75,18 +76,34 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
   // Start syncing this object type
   const syncStartTime = new Date();
 
-  const supagluePaginator = new SupagluePaginator({
-    objectListName,
-    customerId,
-    providerName,
-    destination: isS3Destination
-      ? new S3Destination(
+  function createDestination(name: string) {
+    switch (name) {
+      case "s3":
+        return new S3Destination(
           objectListName,
           customerId,
           providerName,
           syncStartTime
-        )
-      : new PrismaDestination(objectListName, syncStartTime),
+        );
+      case "chroma":
+        return new ChromaDestination(
+          objectListName,
+          customerId,
+          providerName,
+          syncStartTime
+        );
+      case "postgres":
+        return new PrismaDestination(objectListName, syncStartTime);
+    }
+
+    return new PrismaDestination(objectListName, syncStartTime);
+  }
+
+  const supagluePaginator = new SupagluePaginator({
+    objectListName,
+    customerId,
+    providerName,
+    destination: createDestination(process.env.DESTINATION!),
     incremental: IS_INCREMENTAL === "true" || IS_INCREMENTAL === "1",
     watermarkManager,
   });

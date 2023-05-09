@@ -1,4 +1,9 @@
-import { DeleteObjectsCommand, PutObjectCommand, S3Client, paginateListObjectsV2 } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectsCommand,
+  PutObjectCommand,
+  S3Client,
+  paginateListObjectsV2,
+} from "@aws-sdk/client-s3";
 import { Destination } from ".";
 
 const client = new S3Client({
@@ -15,7 +20,12 @@ export class S3Destination implements Destination {
   private providerName: string;
   private syncStartTime: Date;
 
-  constructor(objectListName: string, customerId: string, providerName: string, syncStartTime: Date) {
+  constructor(
+    objectListName: string,
+    customerId: string,
+    providerName: string,
+    syncStartTime: Date
+  ) {
     this.objectListName = objectListName;
     this.customerId = customerId;
     this.providerName = providerName;
@@ -27,7 +37,7 @@ export class S3Destination implements Destination {
   }
 
   async dropExistingRecordsIfNecessary() {
-    console.log('Dropping existing S3 records...', {
+    console.log("Dropping existing S3 records...", {
       objectListName: this.objectListName,
       customerId: this.customerId,
       providerName: this.providerName,
@@ -36,7 +46,8 @@ export class S3Destination implements Destination {
       {
         client,
         pageSize: 1000,
-      }, {
+      },
+      {
         Bucket: process.env.AWS_S3_BUCKET!,
         Prefix: this.getKeyPrefix(),
       }
@@ -44,7 +55,7 @@ export class S3Destination implements Destination {
 
     for await (const page of paginator) {
       const keys = page.Contents?.flatMap((content) => content.Key ?? []) ?? [];
-      console.log('Dropping S3 objects by keys:', JSON.stringify(keys), {
+      console.log("Dropping S3 objects by keys:", JSON.stringify(keys), {
         objectListName: this.objectListName,
         customerId: this.customerId,
         providerName: this.providerName,
@@ -63,18 +74,20 @@ export class S3Destination implements Destination {
   }
 
   async write(results: Record<string, any>[]): Promise<void> {
-    console.log('Writing S3 objects', {
+    console.log("Writing S3 objects", {
       objectListName: this.objectListName,
       customerId: this.customerId,
       providerName: this.providerName,
     });
     if (results.length) {
       const ndjson = results
-        .map((result) => JSON.stringify({
-          ...result,
-          customer_id: this.customerId,
-          provider_name: this.providerName
-        }))
+        .map((result) =>
+          JSON.stringify({
+            ...result,
+            customer_id: this.customerId,
+            provider_name: this.providerName,
+          })
+        )
         .join("\n");
 
       const command = new PutObjectCommand({

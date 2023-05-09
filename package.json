@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "migrate": "prisma migrate dev",
-    "start_for_postgres": "yarn migrate && ts-node index.ts",
-    "start_for_s3": "ts-node index.ts",
-    "start": "yarn start_for_postgres",
+    "start": "ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -25,6 +23,9 @@
     "@aws-sdk/client-s3": "^3.296.0",
     "@prisma/client": "^4.11.0",
     "axios": "^1.3.4",
-    "express": "^4.18.2"
+    "chromadb": "^1.4.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "openai": "^3.2.1"
   }
 }
