@@ -8,14 +8,19 @@ export async function getSupagluePage(
   startingLastModifiedAt: Date,
   cursor?: string
 ): Promise<AxiosResponse<any, any>> {
-  const { API_HOST, API_KEY, PAGE_SIZE = 1000 } = process.env;
+  const {
+    API_HOST,
+    API_KEY,
+    PAGE_SIZE = 1000,
+    INCLUDE_RAW_DATA = "false",
+  } = process.env;
 
   const config = {
     method: "get",
     maxBodyLength: Infinity,
     url: `${API_HOST}/crm/v1/${objectListName}?${querystring.stringify({
       page_size: PAGE_SIZE,
-      // include_raw_data: true,
+      include_raw_data: INCLUDE_RAW_DATA === "true" || INCLUDE_RAW_DATA === "1",
       modified_after: startingLastModifiedAt.toISOString(),
       ...{
         ...(cursor && {
