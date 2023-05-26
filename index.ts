@@ -1,5 +1,6 @@
 import express from "express";
 import { ChromaDestination } from "./lib/destinations/chroma";
+import { MongoDbDestination } from "./lib/destinations/mongodb";
 import { PrismaDestination } from "./lib/destinations/prisma";
 import { S3Destination } from "./lib/destinations/s3";
 import { SupagluePaginator } from "./lib/supaglue_paginator";
@@ -78,6 +79,13 @@ app.post("/supaglue_sync_webhook", async (req, res) => {
 
   function createDestination(name: string) {
     switch (name) {
+      case "mongodb":
+        return new MongoDbDestination(
+          objectListName,
+          customerId,
+          providerName,
+          syncStartTime
+        );
       case "s3":
         return new S3Destination(
           objectListName,
